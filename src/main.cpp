@@ -1,6 +1,7 @@
 #include <memory>
 #include <fstream>
 #include <iostream>
+#include <iterator>
 #include "kernel.hpp"
 #include "opencl.hpp"
 
@@ -101,6 +102,10 @@ int main() {
     for(double y: h_y){
         cout << y << endl;
     }
+
+    ofstream output_file("../data/y_-opencl.txt");
+    ostream_iterator<double> output_iterator(output_file, "\n");
+    copy(h_y.begin(), h_y.end(), output_iterator);
 
     return 0;
 }
