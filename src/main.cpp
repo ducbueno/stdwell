@@ -8,9 +8,9 @@
 using namespace std;
 
 template<typename T>
-void read_vec(char const *fname, vector<T> &temp){
+void read_vec(string fname, vector<T> &temp){
     T value;
-    ifstream input(fname);
+    ifstream input(fname.c_str());
 
     while(input >> value){
         temp.push_back(value);
@@ -18,7 +18,7 @@ void read_vec(char const *fname, vector<T> &temp){
     input.close();
 }
 
-int main() {
+int main(int, char *argv[]) {
     int platformID = 0;
     int deviceID = 0;
 
@@ -50,18 +50,31 @@ int main() {
     vector<double> h_y;
     vector<unsigned int> h_val_pointers;
 
-    read_vec<double>("../data/Cnnzs.txt", h_Cnnzs);
-    read_vec<double>("../data/Dnnzs.txt", h_Dnnzs);
-    read_vec<double>("../data/Bnnzs.txt", h_Bnnzs);
-    read_vec<unsigned int>("../data/Ccols.txt", h_Ccols);
-    read_vec<unsigned int>("../data/Bcols.txt", h_Bcols);
-    read_vec<double>("../data/x.txt", h_x);
-    read_vec<double>("../data/y.txt", h_y);
-    read_vec<unsigned int>("../data/rowptr.txt", h_val_pointers);
+    string fpath;
+    if(string(argv[1]) == "synth"){
+        fpath = "../data/synth/";
+    }
+    else if(string(argv[1]) == "real"){
+        string model = argv[2];
+        fpath = "../data/real/" + model + "/";
+    }
+    else{
+        cout << "Invalig argument(s)" << endl;
+        exit(0);
+    }
 
-    //for(unsigned int cols: h_Bcols){
-    //    cout << cols << endl;
-    //}
+    read_vec<double>(fpath + "Cnnzs.txt", h_Cnnzs);
+    read_vec<double>(fpath + "Dnnzs.txt", h_Dnnzs);
+    read_vec<double>(fpath + "Bnnzs.txt", h_Bnnzs);
+    read_vec<unsigned int>(fpath + "Ccols.txt", h_Ccols);
+    read_vec<unsigned int>(fpath + "Bcols.txt", h_Bcols);
+    read_vec<double>(fpath + "x.txt", h_x);
+    read_vec<double>(fpath + "y.txt", h_y);
+    read_vec<unsigned int>(fpath + "val_pointers.txt", h_val_pointers);
+
+    for(double i: h_Cnnzs){
+        cout << i << endl;
+    }
 
     cl::Buffer d_Cnnzs = cl::Buffer(*context, CL_MEM_READ_WRITE, sizeof(double) * h_Cnnzs.size());
     cl::Buffer d_Dnnzs = cl::Buffer(*context, CL_MEM_READ_WRITE, sizeof(double) * h_Dnnzs.size());
@@ -103,7 +116,8 @@ int main() {
         cout << y << endl;
     }
 
-    ofstream output_file("../data/y_-opencl.txt");
+    string opath = fpath + "y_-opencl.txt";
+    ofstream output_file(opath.c_str());
     ostream_iterator<double> output_iterator(output_file, "\n");
     copy(h_y.begin(), h_y.end(), output_iterator);
 

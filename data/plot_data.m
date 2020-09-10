@@ -1,10 +1,10 @@
-y_matlab = readmatrix("synth/y_.txt");
-y_opencl = readmatrix("synth/y_-opencl.txt");
+% y_matlab = readmatrix("real/spe1case1/y_.txt");
+% y_opencl = readmatrix("real/spe1case1/y_-opencl.txt");
 
 figure
 hold on
-plot(y_matlab, 'g');
-plot(y_opencl, 'b');
-plot(y_matlab - y_opencl, 'r');
+plot(y_, 'g');
+plot(y__opencl, 'b');
+% plot(y__flow - y__opencl, 'r');
 hold off
-legend('matlab', 'opencl', 'difference');
+legend('matlab', 'opencl');
