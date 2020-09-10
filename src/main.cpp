@@ -87,6 +87,11 @@ int main() {
     const unsigned int total_work_items = num_std_wells * work_group_size;
     const unsigned int lmem1 = sizeof(double) * work_group_size;
     const unsigned int lmem2 = sizeof(double) * dim_wells;
+
+    stdwell_k.reset(new cl::make_kernel<cl::Buffer&, cl::Buffer&, cl::Buffer&, cl::Buffer&,
+                    cl::Buffer&, cl::Buffer&, cl::Buffer&, const unsigned int,
+                    const unsigned int, cl::Buffer&, cl::LocalSpaceArg, cl::LocalSpaceArg,
+                    cl::LocalSpaceArg>(cl::Kernel(program, "stdwell")));
     cl::Event event = (*stdwell_k)(cl::EnqueueArgs(*queue, cl::NDRange(total_work_items), cl::NDRange(work_group_size)),
                                    d_Cnnzs, d_Dnnzs, d_Bnnzs, d_Ccols, d_Bcols, d_x, d_y, dim_weqs, dim_wells, d_val_pointers,
                                    cl::Local(lmem1), cl::Local(lmem2), cl::Local(lmem2));

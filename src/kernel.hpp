@@ -2,19 +2,19 @@
 #define __KERNEL_H_
 
 const char* stdwell_s = R"(
-__kernel void add_well_contributions(__global const double *valsC,
-                                     __global const double *valsD,
-                                     __global const double *valsB,
-                                     __global const int *colsC,
-                                     __global const int *colsB,
-                                     __global const double *x,
-                                     __global double *y,
-                                     const unsigned int blnc,
-                                     const unsigned int blnr,
-                                     __global const unsigned int *rowptr,
-                                     __local double *localSum,
-                                     __local double *z1,
-                                     __local double *z2){
+__kernel void stdwell(__global const double *valsC,
+                      __global const double *valsD,
+                      __global const double *valsB,
+                      __global const int *colsC,
+                      __global const int *colsB,
+                      __global const double *x,
+                      __global double *y,
+                      const unsigned int blnc,
+                      const unsigned int blnr,
+                      __global const unsigned int *rowptr,
+                      __local double *localSum,
+                      __local double *z1,
+                      __local double *z2){
     int wgId = get_group_id(0);
     int wiId = get_local_id(0);
     int valSize = rowptr[wgId + 1] - rowptr[wgId];
