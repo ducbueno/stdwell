@@ -94,7 +94,7 @@ int main(int, char *argv[]) {
     queue->enqueueWriteBuffer(d_y, CL_TRUE, 0, sizeof(double) * h_y.size(), h_y.data());
     queue->enqueueWriteBuffer(d_val_pointers, CL_TRUE, 0, sizeof(unsigned int) * h_val_pointers.size(), h_val_pointers.data());
 
-    const unsigned int num_std_wells = val_pointers.size() - 1;
+    const unsigned int num_std_wells = h_val_pointers.size() - 1;
     const unsigned int dim_weqs = 3;
     const unsigned int dim_wells = 4;
     const unsigned int work_group_size = 32;
