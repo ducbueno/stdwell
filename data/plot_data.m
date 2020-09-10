@@ -1,5 +1,5 @@
-y_matlab = readmatrix("y_.txt");
-y_opencl = readmatrix("y_-opencl.txt");
+y_matlab = readmatrix("synth/y_.txt");
+y_opencl = readmatrix("synth/y_-opencl.txt");
 
 figure
 hold on

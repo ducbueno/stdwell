@@ -41,12 +41,12 @@ y = rand(150, 1);
  
 y_ = y - C'*D*B*x;
 
-writematrix(Bnnzs', 'Bnnzs.txt');
-writematrix(Dnnzs', 'Dnnzs.txt');
-writematrix(Cnnzs', 'Cnnzs.txt');
-writematrix(cols', 'Bcols.txt');
-writematrix(cols', 'Ccols.txt');
-writematrix(rowptr', 'rowptr.txt');
-writematrix(x, 'x.txt');
-writematrix(y, 'y.txt');
-writematrix(y_, 'y_.txt');
+writematrix(Bnnzs', 'synth/Bnnzs.txt');
+writematrix(Dnnzs', 'synth/Dnnzs.txt');
+writematrix(Cnnzs', 'synth/Cnnzs.txt');
+writematrix(cols', 'synth/Bcols.txt');
+writematrix(cols', 'synth/Ccols.txt');
+writematrix(rowptr', 'synth/rowptr.txt');
+writematrix(x, 'synth/x.txt');
+writematrix(y, 'synth/y.txt');
+writematrix(y_, 'synth/y_.txt');
