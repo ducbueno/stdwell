@@ -1,10 +1,14 @@
-% y_matlab = readmatrix("real/spe1case1/y_.txt");
-% y_opencl = readmatrix("real/spe1case1/y_-opencl.txt");
+y_matlab = readmatrix("real/spe3case1/y_-matlab.txt");
+y_opencl = readmatrix("real/spe3case1/y_-opencl.txt");
+y_cuda = readmatrix("real/spe3case1/y_-cuda.txt");
+y_flow = readmatrix("real/spe3case1/y_.txt");
 
-figure
-hold on
-plot(y_, 'g');
-plot(y__opencl, 'b');
-% plot(y__flow - y__opencl, 'r');
-hold off
-legend('matlab', 'opencl');
+stru = [y_matlab y_opencl y_cuda y_flow];
+
+% figure
+% hold on
+% plot(y_matlab, 'g');
+% plot(y_opencl, 'b');
+% plot(y_cuda, 'r');
+% hold off
+% legend('opencl', 'cuda');

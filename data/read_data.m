@@ -2,7 +2,7 @@ dim = 3;
 dim_wells = 4;
 vals_per_block = dim*dim_wells;
 
-model = 'norne/';
+model = 'spe10model1/';
 dir = strcat('real/', model);
 rowptr = readmatrix(strcat(dir, 'val_pointers.txt'));
 Ccols = readmatrix(strcat(dir, 'Ccols.txt'));
@@ -12,7 +12,6 @@ Dnnzs = readmatrix(strcat(dir, 'Dnnzs.txt'));
 Bnnzs = readmatrix(strcat(dir, 'Bnnzs.txt'));
 x = readmatrix(strcat(dir, 'x.txt'));
 y = readmatrix(strcat(dir, 'y.txt'));
-y__flow = readmatrix(strcat(dir, 'y_.txt'));
 
 num_std_wells = length(rowptr) - 1;
 
@@ -47,3 +46,5 @@ end
 Bx = B*x;
 DBx = D*Bx;
 y_ = y - C'*DBx;
+
+writematrix(y_, strcat(dir, 'y_-matlab.txt'))
