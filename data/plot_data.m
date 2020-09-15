@@ -1,14 +1,17 @@
-y_matlab = readmatrix("real/spe3case1/y_-matlab.txt");
-y_opencl = readmatrix("real/spe3case1/y_-opencl.txt");
-y_cuda = readmatrix("real/spe3case1/y_-cuda.txt");
-y_flow = readmatrix("real/spe3case1/y_.txt");
+function plot_data(model)
+    y = readmatrix(strcat('real/', model ,'/y.txt'));
+    y_matlab = readmatrix(strcat('real/', model ,'/y_-matlab.txt'));
+    y_opencl = readmatrix(strcat('real/', model ,'/y_-opencl.txt'));
+    y_cuda = readmatrix(strcat('real/', model ,'/y_-cuda.txt'));
+    y_flow = readmatrix(strcat('real/', model ,'/y_-flow.txt'));
 
-stru = [y_matlab y_opencl y_cuda y_flow];
+    figure;
+    subplot(1, 2, 1);
+    plot(y_flow - y);
+    subplot(1, 2, 2);
+    plot(y_opencl - y);
 
-% figure
-% hold on
-% plot(y_matlab, 'g');
-% plot(y_opencl, 'b');
-% plot(y_cuda, 'r');
-% hold off
-% legend('opencl', 'cuda');
+
+    % err_opencl = norm(y_cuda - y_opencl)/norm(y_cuda);
+    % err_flow = norm(y_cuda - y_flow)/norm(y_cuda);
+end

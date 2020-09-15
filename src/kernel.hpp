@@ -23,7 +23,8 @@ __kernel void stdwell(__global const double *valsC,
     int numBlocksPerWarp = 32/valsPerBlock;
     int c = wiId % blnc;
     int r = (wiId/blnc) % blnr;
-    double temp;
+
+    barrier(CLK_LOCAL_MEM_FENCE);
 
     localSum[wiId] = 0;
     if(wiId < numActiveWorkItems){
@@ -33,28 +34,27 @@ __kernel void stdwell(__global const double *valsC,
             localSum[wiId] += valsB[b*blnc*blnr + r*blnc + c]*x[colIdx*blnc + c];
             b += numBlocksPerWarp;
         }
-    }
 
-    barrier(CLK_LOCAL_MEM_FENCE);
-
-    int stride = valsPerBlock;
-    if(wiId < stride){
-        localSum[wiId] += localSum[wiId + stride];
-    }
-
-    barrier(CLK_LOCAL_MEM_FENCE);
-
-    if(c == 0 && wiId < valsPerBlock){
-        for(stride = 2; stride > 0; stride >>= 1){
-            localSum[wiId] += localSum[wiId + stride];
+        if(wiId < valsPerBlock){
+            localSum[wiId] += localSum[wiId + valsPerBlock];
         }
-        z1[r] = localSum[wiId];
+
+        b = wiId/valsPerBlock + rowptr[wgId];
+
+        if(wiId < valsPerBlock){
+            if(c == 0 || c == 2) {localSum[wiId] += localSum[wiId + 2];}
+            if(c == 0 || c == 1) {localSum[wiId] += localSum[wiId + 1];}
+        }
+
+        if(c == 0 && wiId < valsPerBlock){
+            z1[r] = localSum[wiId];
+        }
     }
 
     barrier(CLK_LOCAL_MEM_FENCE);
 
     if(wiId < blnr){
-        temp = 0.0;
+        double temp = 0.0;
         for(unsigned int i = 0; i < blnr; ++i){
             temp += valsD[wgId*blnr*blnr + wiId*blnr + i]*z1[i];
         }
@@ -64,7 +64,7 @@ __kernel void stdwell(__global const double *valsC,
     barrier(CLK_LOCAL_MEM_FENCE);
 
     if(wiId < blnc*valSize){
-        temp = 0.0;
+        double temp = 0.0;
         int bb = wiId/blnc + rowptr[wgId];
         int colIdx = colsC[bb];
         for (unsigned int j = 0; j < blnr; ++j){
