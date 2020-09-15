@@ -7,7 +7,7 @@ function plot_data(model)
 
     figure;
     subplot(1, 2, 1);
-    plot(y_flow - y);
+    plot(y_cuda - y);
     subplot(1, 2, 2);
     plot(y_opencl - y);
 
