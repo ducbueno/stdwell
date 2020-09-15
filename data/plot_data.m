@@ -1,9 +1,7 @@
 function plot_data(model)
-    y = readmatrix(strcat('real/', model ,'/y.txt'));
-    y_matlab = readmatrix(strcat('real/', model ,'/y_-matlab.txt'));
-    y_opencl = readmatrix(strcat('real/', model ,'/y_-opencl.txt'));
-    y_cuda = readmatrix(strcat('real/', model ,'/y_-cuda.txt'));
-    y_flow = readmatrix(strcat('real/', model ,'/y_-flow.txt'));
+    y = readmatrix(strcat('real/', model,'/y.txt'));
+    y_opencl = readmatrix(strcat('real/', model,'/y_-opencl.txt'));
+    y_cuda = readmatrix(strcat('real/', model,'/y_-cuda.txt'));
 
     figure;
     subplot(1, 2, 1);
@@ -11,7 +9,6 @@ function plot_data(model)
     subplot(1, 2, 2);
     plot(y_opencl - y);
 
-
-    % err_opencl = norm(y_cuda - y_opencl)/norm(y_cuda);
-    % err_flow = norm(y_cuda - y_flow)/norm(y_cuda);
+    err_opencl = norm(y_cuda - y_opencl)/norm(y_cuda);
+    disp(err_opencl);
 end
