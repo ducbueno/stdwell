@@ -3,7 +3,7 @@ function read_data(model)
     dim_wells = 4;
     vals_per_block = dim*dim_wells;
 
-    dir = strcat('real/', model, '/');
+    dir = strcat('../data/real/', model, '/');
     rowptr = readmatrix(strcat(dir, 'val_pointers.txt'));
     Ccols = readmatrix(strcat(dir, 'Ccols.txt'));
     Bcols = readmatrix(strcat(dir, 'Bcols.txt'));

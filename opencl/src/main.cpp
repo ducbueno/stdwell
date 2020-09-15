@@ -52,11 +52,11 @@ int main(int, char *argv[]) {
 
     string fpath;
     if(string(argv[1]) == "synth"){
-        fpath = "../data/synth/";
+        fpath = "../../data/synth/";
     }
     else if(string(argv[1]) == "real"){
         string model = argv[2];
-        fpath = "../data/real/" + model + "/";
+        fpath = "../../data/real/" + model + "/";
     }
     else{
         cout << "Invalig argument(s)" << endl;
