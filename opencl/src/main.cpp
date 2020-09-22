@@ -46,8 +46,10 @@ int main(int, char *argv[]) {
     vector<double> h_Bnnzs;
     vector<unsigned int> h_Ccols;
     vector<unsigned int> h_Bcols;
-    vector<double> h_x;
-    vector<double> h_y;
+    vector<double> h_pw;
+    vector<double> h_v;
+    vector<double> h_s;
+    vector<double> h_t;
     vector<unsigned int> h_val_pointers;
 
     string fpath;
@@ -68,21 +70,25 @@ int main(int, char *argv[]) {
     read_vec<double>(fpath + "Bnnzs.txt", h_Bnnzs);
     read_vec<unsigned int>(fpath + "Ccols.txt", h_Ccols);
     read_vec<unsigned int>(fpath + "Bcols.txt", h_Bcols);
-    read_vec<double>(fpath + "x.txt", h_x);
-    read_vec<double>(fpath + "y.txt", h_y);
+    read_vec<double>(fpath + "pw.txt", h_pw);
+    read_vec<double>(fpath + "v.txt", h_v);
+    read_vec<double>(fpath + "s.txt", h_s);
+    read_vec<double>(fpath + "t.txt", h_t);
     read_vec<unsigned int>(fpath + "val_pointers.txt", h_val_pointers);
 
-    for(double i: h_Cnnzs){
-        cout << i << endl;
-    }
+    //for(double i: h_Cnnzs){
+    //    cout << i << endl;
+    //}
 
     cl::Buffer d_Cnnzs = cl::Buffer(*context, CL_MEM_READ_WRITE, sizeof(double) * h_Cnnzs.size());
     cl::Buffer d_Dnnzs = cl::Buffer(*context, CL_MEM_READ_WRITE, sizeof(double) * h_Dnnzs.size());
     cl::Buffer d_Bnnzs = cl::Buffer(*context, CL_MEM_READ_WRITE, sizeof(double) * h_Bnnzs.size());
     cl::Buffer d_Ccols = cl::Buffer(*context, CL_MEM_READ_WRITE, sizeof(unsigned int) * h_Ccols.size());
     cl::Buffer d_Bcols = cl::Buffer(*context, CL_MEM_READ_WRITE, sizeof(unsigned int) * h_Bcols.size());
-    cl::Buffer d_x = cl::Buffer(*context, CL_MEM_READ_WRITE, sizeof(double) * h_x.size());
-    cl::Buffer d_y = cl::Buffer(*context, CL_MEM_READ_WRITE, sizeof(double) * h_y.size());
+    cl::Buffer d_pw = cl::Buffer(*context, CL_MEM_READ_WRITE, sizeof(double) * h_pw.size());
+    cl::Buffer d_v = cl::Buffer(*context, CL_MEM_READ_WRITE, sizeof(double) * h_v.size());
+    cl::Buffer d_s = cl::Buffer(*context, CL_MEM_READ_WRITE, sizeof(double) * h_s.size());
+    cl::Buffer d_t = cl::Buffer(*context, CL_MEM_READ_WRITE, sizeof(double) * h_t.size());
     cl::Buffer d_val_pointers = cl::Buffer(*context, CL_MEM_READ_WRITE, sizeof(unsigned int) * h_val_pointers.size());
 
     queue->enqueueWriteBuffer(d_Cnnzs, CL_TRUE, 0, sizeof(double) * h_Cnnzs.size(), h_Cnnzs.data());
@@ -90,8 +96,10 @@ int main(int, char *argv[]) {
     queue->enqueueWriteBuffer(d_Bnnzs, CL_TRUE, 0, sizeof(double) * h_Bnnzs.size(), h_Bnnzs.data());
     queue->enqueueWriteBuffer(d_Ccols, CL_TRUE, 0, sizeof(unsigned int) * h_Ccols.size(), h_Ccols.data());
     queue->enqueueWriteBuffer(d_Bcols, CL_TRUE, 0, sizeof(unsigned int) * h_Bcols.size(), h_Bcols.data());
-    queue->enqueueWriteBuffer(d_x, CL_TRUE, 0, sizeof(double) * h_x.size(), h_x.data());
-    queue->enqueueWriteBuffer(d_y, CL_TRUE, 0, sizeof(double) * h_y.size(), h_y.data());
+    queue->enqueueWriteBuffer(d_pw, CL_TRUE, 0, sizeof(double) * h_pw.size(), h_pw.data());
+    queue->enqueueWriteBuffer(d_v, CL_TRUE, 0, sizeof(double) * h_v.size(), h_v.data());
+    queue->enqueueWriteBuffer(d_s, CL_TRUE, 0, sizeof(double) * h_s.size(), h_s.data());
+    queue->enqueueWriteBuffer(d_t, CL_TRUE, 0, sizeof(double) * h_t.size(), h_t.data());
     queue->enqueueWriteBuffer(d_val_pointers, CL_TRUE, 0, sizeof(unsigned int) * h_val_pointers.size(), h_val_pointers.data());
 
     const unsigned int num_std_wells = h_val_pointers.size() - 1;
@@ -106,20 +114,29 @@ int main(int, char *argv[]) {
                     cl::Buffer&, cl::Buffer&, cl::Buffer&, const unsigned int,
                     const unsigned int, cl::Buffer&, cl::LocalSpaceArg, cl::LocalSpaceArg,
                     cl::LocalSpaceArg>(cl::Kernel(program, "stdwell")));
-    cl::Event event = (*stdwell_k)(cl::EnqueueArgs(*queue, cl::NDRange(total_work_items), cl::NDRange(work_group_size)),
-                                   d_Cnnzs, d_Dnnzs, d_Bnnzs, d_Ccols, d_Bcols, d_x, d_y, dim_weqs, dim_wells, d_val_pointers,
-                                   cl::Local(lmem1), cl::Local(lmem2), cl::Local(lmem2));
+    cl::Event event;
+    event = (*stdwell_k)(cl::EnqueueArgs(*queue, cl::NDRange(total_work_items), cl::NDRange(work_group_size)),
+                         d_Cnnzs, d_Dnnzs, d_Bnnzs, d_Ccols, d_Bcols, d_pw, d_v, dim_weqs, dim_wells, d_val_pointers,
+                         cl::Local(lmem1), cl::Local(lmem2), cl::Local(lmem2));
+    event = (*stdwell_k)(cl::EnqueueArgs(*queue, cl::NDRange(total_work_items), cl::NDRange(work_group_size)),
+                         d_Cnnzs, d_Dnnzs, d_Bnnzs, d_Ccols, d_Bcols, d_s, d_t, dim_weqs, dim_wells, d_val_pointers,
+                         cl::Local(lmem1), cl::Local(lmem2), cl::Local(lmem2));
 
-    queue->enqueueReadBuffer(d_y, CL_TRUE, 0, sizeof(double) * h_y.size(), h_y.data());
+    queue->enqueueReadBuffer(d_v, CL_TRUE, 0, sizeof(double) * h_v.size(), h_v.data());
+    queue->enqueueReadBuffer(d_t, CL_TRUE, 0, sizeof(double) * h_t.size(), h_t.data());
 
-    for(double y: h_y){
-        cout << y << endl;
-    }
+    //for(double y: h_y){
+    //    cout << y << endl;
+    //}
 
-    string opath = fpath + "y_-opencl.txt";
-    ofstream output_file(opath.c_str());
-    ostream_iterator<double> output_iterator(output_file, "\n");
-    copy(h_y.begin(), h_y.end(), output_iterator);
+    string v_opath = fpath + "v_-opencl.txt";
+    string t_opath = fpath + "t_-opencl.txt";
+    ofstream v_output_file(v_opath.c_str());
+    ofstream t_output_file(t_opath.c_str());
+    ostream_iterator<double> v_output_iterator(v_output_file, "\n");
+    ostream_iterator<double> t_output_iterator(t_output_file, "\n");
+    copy(h_v.begin(), h_v.end(), v_output_iterator);
+    copy(h_t.begin(), h_t.end(), t_output_iterator);
 
     return 0;
 }
